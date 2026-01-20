@@ -20,6 +20,10 @@ A lightweight, browser-only data explorer for the bundled `data.csv` file, with 
 4. Optionally paste CSV data or upload a CSV file to replace it.
 5. Use the filter controls and chart selectors to explore your data.
 
+## UI stack
+
+The interface uses Tailwind CSS via the CDN for a modern, responsive layout.
+
 ## Why this works without file upload
 
 If you cannot attach a CSV in your environment, the app still loads the bundled `data.csv` automatically, or you can paste CSV text directly into the textarea. All parsing happens in the browser, so nothing is uploaded to a server.

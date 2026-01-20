@@ -62,7 +62,9 @@ const updateStatus = (message, isError = false) => {
     return;
   }
   elements.dataStatus.textContent = message;
-  elements.dataStatus.classList.toggle("error", isError);
+  elements.dataStatus.classList.toggle("text-red-600", isError);
+  elements.dataStatus.classList.toggle("font-semibold", isError);
+  elements.dataStatus.classList.toggle("text-slate-500", !isError);
 };
 
 const loadDataFile = async () => {
@@ -216,24 +218,24 @@ const renderTable = () => {
     });
   }
 
-  const header = `<tr>${state.columns
+  const header = `<tr class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">${state.columns
     .map((column) => {
       const isSorted = state.sort.column === column;
       const arrow = isSorted ? (state.sort.direction === 1 ? "▲" : "▼") : "";
-      return `<th data-column="${column}">${column} <span class="sort-indicator">${arrow}</span></th>`;
+      return `<th data-column="${column}" class="cursor-pointer whitespace-nowrap px-4 py-3 text-left font-semibold">${column} <span class="ml-1 text-[10px] text-indigo-500">${arrow}</span></th>`;
     })
     .join("")}</tr>`;
 
   const body = rows
     .map(
       (row) =>
-        `<tr>${state.columns
-          .map((column) => `<td>${row[column] ?? ""}</td>`)
+        `<tr class="border-t border-slate-200">${state.columns
+          .map((column) => `<td class="whitespace-nowrap px-4 py-3 text-sm text-slate-600">${row[column] ?? ""}</td>`)
           .join("")}</tr>`
     )
     .join("");
 
-  elements.dataTable.innerHTML = `<table><thead>${header}</thead><tbody>${body}</tbody></table>`;
+  elements.dataTable.innerHTML = `<table class="w-full border-collapse">${header ? `<thead>${header}</thead>` : ""}<tbody>${body}</tbody></table>`;
 
   elements.dataTable.querySelectorAll("th").forEach((th) => {
     th.addEventListener("click", () => {
@@ -396,14 +398,18 @@ const destroyChart = (key) => {
 };
 
 const tableFromRows = (columns, rows) => {
-  const header = `<tr>${columns.map((column) => `<th>${column.label}</th>`).join("")}</tr>`;
+  const header = `<tr class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">${columns
+    .map((column) => `<th class="px-4 py-3 text-left font-semibold">${column.label}</th>`)
+    .join("")}</tr>`;
   const body = rows
     .map(
       (row) =>
-        `<tr>${columns.map((column) => `<td>${row[column.value]}</td>`).join("")}</tr>`
+        `<tr class="border-t border-slate-200">${columns
+          .map((column) => `<td class="px-4 py-3 text-sm text-slate-600">${row[column.value]}</td>`)
+          .join("")}</tr>`
     )
     .join("");
-  return `<table><thead>${header}</thead><tbody>${body}</tbody></table>`;
+  return `<table class="w-full border-collapse"><thead>${header}</thead><tbody>${body}</tbody></table>`;
 };
 
 elements.parseButton.addEventListener("click", () => {
