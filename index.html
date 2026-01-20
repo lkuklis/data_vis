@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CSV Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-slate-50 text-slate-900">
+    <header class="bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-500 text-white">
+      <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-10">
+        <div>
+          <p class="text-sm uppercase tracking-[0.2em] text-white/70">CSV Explorer</p>
+          <h1 class="mt-2 text-3xl font-semibold sm:text-4xl">Explore your data instantly</h1>
+          <p class="mt-3 max-w-2xl text-base text-white/80">
+            Load the bundled dataset or paste your own CSV to run quick EDA, slice and filter records, and build
+            interactive charts.
+          </p>
+        </div>
+        <button id="load-data" class="rounded-full bg-white px-5 py-2 text-sm font-semibold text-indigo-700 shadow hover:bg-indigo-50">
+          Reload data.csv
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-8">
+      <section class="rounded-3xl bg-white p-6 shadow-lg shadow-slate-200/70">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-semibold">Load data</h2>
+            <p class="text-sm text-slate-500">Bring in the CSV you want to explore.</p>
+          </div>
+        </div>
+        <div class="mt-6 grid gap-6 lg:grid-cols-[1.4fr,1fr]">
+          <div>
+            <label class="text-sm font-semibold text-slate-700" for="csv-input">Paste CSV data</label>
+            <textarea
+              id="csv-input"
+              rows="10"
+              class="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 shadow-inner focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              placeholder="name,category,amount,score\nAlpha,A,12,88"
+            ></textarea>
+            <div class="mt-4 flex flex-wrap gap-3">
+              <button id="parse-csv" class="rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500">
+                Parse pasted CSV
+              </button>
+              <button id="clear-csv" class="rounded-full border border-slate-200 px-5 py-2 text-sm font-semibold text-slate-600 hover:border-indigo-200 hover:text-indigo-600">
+                Clear
+              </button>
+            </div>
+            <p id="data-status" class="mt-3 text-sm text-slate-500">Loading data.csv…</p>
+          </div>
+          <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-5">
+            <label class="text-sm font-semibold text-slate-700" for="csv-file">Upload CSV file</label>
+            <input
+              id="csv-file"
+              type="file"
+              accept=".csv,text/csv"
+              class="mt-3 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
+            />
+            <p class="mt-4 text-sm text-slate-500">Files stay in your browser; nothing is uploaded.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="rounded-3xl bg-white p-6 shadow-lg shadow-slate-200/70">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-semibold">Exploratory summary</h2>
+            <p class="text-sm text-slate-500">Quick signals on shape, missingness, and numeric stats.</p>
+          </div>
+        </div>
+        <div class="mt-6 grid gap-4 sm:grid-cols-3">
+          <div class="rounded-2xl bg-indigo-50 p-4">
+            <p class="text-xs font-semibold uppercase tracking-wide text-indigo-600">Rows</p>
+            <p id="row-count" class="mt-2 text-2xl font-semibold text-indigo-900">0</p>
+          </div>
+          <div class="rounded-2xl bg-indigo-50 p-4">
+            <p class="text-xs font-semibold uppercase tracking-wide text-indigo-600">Columns</p>
+            <p id="column-count" class="mt-2 text-2xl font-semibold text-indigo-900">0</p>
+          </div>
+          <div class="rounded-2xl bg-indigo-50 p-4">
+            <p class="text-xs font-semibold uppercase tracking-wide text-indigo-600">Missing values</p>
+            <p id="missing-count" class="mt-2 text-2xl font-semibold text-indigo-900">0</p>
+          </div>
+        </div>
+        <div class="mt-6 grid gap-6 lg:grid-cols-2">
+          <div>
+            <h3 class="text-sm font-semibold text-slate-600">Missing values by column</h3>
+            <div id="missing-table" class="mt-3 overflow-hidden rounded-2xl border border-slate-200"></div>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-slate-600">Numeric summary</h3>
+            <div id="numeric-summary" class="mt-3 overflow-hidden rounded-2xl border border-slate-200"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="rounded-3xl bg-white p-6 shadow-lg shadow-slate-200/70">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-semibold">Filter &amp; sort</h2>
+            <p class="text-sm text-slate-500">Focus on the records that matter most.</p>
+          </div>
+          <button id="clear-filter" class="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:border-indigo-200 hover:text-indigo-600">
+            Clear filter
+          </button>
+        </div>
+        <div class="mt-5 grid gap-4 md:grid-cols-[1fr,1fr]">
+          <div>
+            <label class="text-sm font-semibold text-slate-700" for="filter-column">Filter column</label>
+            <select
+              id="filter-column"
+              class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            ></select>
+          </div>
+          <div>
+            <label class="text-sm font-semibold text-slate-700" for="filter-value">Filter value (contains)</label>
+            <input
+              id="filter-value"
+              type="text"
+              placeholder="Type to filter"
+              class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </div>
+        </div>
+        <div id="data-table" class="mt-6 overflow-hidden rounded-2xl border border-slate-200"></div>
+      </section>
+
+      <section class="rounded-3xl bg-white p-6 shadow-lg shadow-slate-200/70">
+        <div>
+          <h2 class="text-xl font-semibold">Charts</h2>
+          <p class="text-sm text-slate-500">Visualize distributions, category performance, and correlations.</p>
+        </div>
+        <div class="mt-6 grid gap-6 lg:grid-cols-3">
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <h3 class="text-sm font-semibold text-slate-600">Histogram</h3>
+              <select
+                id="histogram-column"
+                class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600"
+              ></select>
+            </div>
+            <div class="mt-4 rounded-xl bg-white p-3 shadow-sm">
+              <canvas id="histogram"></canvas>
+            </div>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <h3 class="text-sm font-semibold text-slate-600">Category counts</h3>
+              <select
+                id="category-column"
+                class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600"
+              ></select>
+            </div>
+            <div class="mt-4 rounded-xl bg-white p-3 shadow-sm">
+              <canvas id="category-chart"></canvas>
+            </div>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <h3 class="text-sm font-semibold text-slate-600">Scatter plot</h3>
+              <div class="flex flex-wrap gap-2">
+                <select
+                  id="scatter-x"
+                  class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600"
+                ></select>
+                <select
+                  id="scatter-y"
+                  class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600"
+                ></select>
+              </div>
+            </div>
+            <div class="mt-4 rounded-xl bg-white p-3 shadow-sm">
+              <canvas id="scatter-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="py-10 text-center text-sm text-slate-400">
+      <p>Tip: if you cannot upload a file, the bundled data.csv loads automatically or you can paste CSV text.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
