@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CSV Explorer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div>
+        <h1>CSV Explorer</h1>
+        <p>Load a CSV by pasting it below or using a local file, then explore, filter, and chart the data.</p>
+      </div>
+      <button id="load-data" class="secondary">Reload data.csv</button>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h2>Load data</h2>
+        <div class="load-grid">
+          <div>
+            <label class="input-label" for="csv-input">Paste CSV data</label>
+            <textarea id="csv-input" rows="10" placeholder="name,category,amount,score\nAlpha,A,12,88"></textarea>
+            <div class="button-row">
+              <button id="parse-csv">Parse pasted CSV</button>
+              <button id="clear-csv" class="secondary">Clear</button>
+            </div>
+            <p id="data-status" class="helper">Loading data.csv…</p>
+          </div>
+          <div>
+            <label class="input-label" for="csv-file">Upload CSV file</label>
+            <input id="csv-file" type="file" accept=".csv,text/csv" />
+            <p class="helper">Files stay in your browser; nothing is uploaded.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Exploratory summary</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <p class="stat-label">Rows</p>
+            <p id="row-count" class="stat-value">0</p>
+          </div>
+          <div class="stat-card">
+            <p class="stat-label">Columns</p>
+            <p id="column-count" class="stat-value">0</p>
+          </div>
+          <div class="stat-card">
+            <p class="stat-label">Missing values</p>
+            <p id="missing-count" class="stat-value">0</p>
+          </div>
+        </div>
+        <div id="missing-table" class="table-wrapper"></div>
+        <div id="numeric-summary" class="table-wrapper"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Filter & sort</h2>
+        </div>
+        <div class="filters">
+          <div>
+            <label class="input-label" for="filter-column">Filter column</label>
+            <select id="filter-column"></select>
+          </div>
+          <div>
+            <label class="input-label" for="filter-value">Filter value (contains)</label>
+            <input id="filter-value" type="text" placeholder="Type to filter" />
+          </div>
+          <div class="filter-actions">
+            <button id="clear-filter" class="secondary">Clear filter</button>
+          </div>
+        </div>
+        <div id="data-table" class="table-wrapper"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Charts</h2>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Histogram</h3>
+              <select id="histogram-column"></select>
+            </div>
+            <canvas id="histogram"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Category counts</h3>
+              <select id="category-column"></select>
+            </div>
+            <canvas id="category-chart"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Scatter plot</h3>
+              <div class="scatter-selects">
+                <select id="scatter-x"></select>
+                <select id="scatter-y"></select>
+              </div>
+            </div>
+            <canvas id="scatter-chart"></canvas>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Tip: if you cannot upload a file, the bundled data.csv loads automatically or you can paste CSV text.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
